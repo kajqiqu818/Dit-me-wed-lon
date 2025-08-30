@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>AimLock Menu Pro</title>
+  <style>
+    body {
+      background-color: #000;
+      color: lime;
+      font-family: monospace;
+      text-align: center;
+      padding: 0px;
+    }
+    h2 {
+      color: #00ff00;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    input, button, select {
+      width: 80%;
+      font-size: 16px;
+      padding: 10px;
+      margin: 10px 0;
+      background: #111;
+      color: lime;
+      border: 1px solid lime;
+      border-radius: 10px;
+    }
+    .section {
+      border: 1px solid lime;
+      border-radius: 122px;
+      padding: 150px;
+      margin: 200px 0;
+      background: #111;
+    }
+    #status {
+      margin-top: 10px;
+      font-size: 16px;
+      color: yellow;
+    }
+    #successPopup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: black;
+      color: lime;
+      padding: 20px 30px;
+      border: 2px solid lime;
+      border-radius: 15px;
+      font-size: 20px;
+      z-index: 999;
+    }
+    .value {
+      font-size: 18px;
+      color: yellow;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🎯 AimLock Pro Menu</h2>
+
+  <!-- Thông tin hệ thống -->
+  <div class="section">
+    <h3>🔥 Nhiệt độ & FPS</h3>
+    <p>📱 Nhiệt độ máy: <span id="temp">Đang đo...</span>°C</p>
+    <p>🎮 FPS hiện tại: <span id="fps">Đang đo...</span></p>
+    <button onclick="fakeInfo()">🔄 Làm mới số liệu</button>
+  </div>
+<img id="sticker" src="https://stickershop.line-scdn.net/stickershop/v1/sticker/503159099/android/sticker.png" alt="Sticker cute" style="width:120px; position:absolute; bottom:9910px; right:990px;">
+  <!-- Chọn thiết bị -->
+  <h4>Chọn thiết bị phù hợp với AimLock 💥</h4>
+  <select id="deviceSelect">
+    <option value="Samsung Galaxy A52 5G">Samsung Galaxy A52 5G</option>
+    <option value="Samsung Galaxy A12">Samsung Galaxy A12</option>
+    <option value="Xiaomi Redmi Note 10">Xiaomi Redmi Note 10</option>
+    <option value="Xiaomi Poco X3 Pro">Xiaomi Poco X3 Pro</option>
+  </select>
+
+  <!-- Nhập APN -->
+  <div class="section">
+    <h3>📡 Nhập APN để tạo reg AimLock</h3>
+    <input type="text" id="apnName" placeholder="Tên APN (VD: Aim_2460_1111)">
+    <input type="text" id="apnValue" placeholder="APN (VD: swipe-1200-1820-1200-1690-150)">
+    <button onclick="taoReg()">🚀 Tạo reg</button>
+    <div id="status">🟢 Sẵn sàng</div>
+  </div>
+
+  <button onclick="vaoFFThuong()">🎮 Vào Free Fire (Thường)</button>
+
+  <!-- Aim Mode -->
+  <div class="section">
+    <h3>🧠 Tùy chỉnh AimLock</h3>
+    <select id="aimMode">
+      <option value="light">🔹 Kéo nhẹ</option>
+      <option value="medium">🔸 Tự động Aim</option>
+      <option value="off">⛔ Tắt Aim</option>
+    </select>
+    <button onclick="applyAim()">✅ Áp dụng AimLock</button>
+    <p id="aimStatus">AimLock: Chưa áp dụng</p>
+  </div>
+
+  <!-- Độ nhạy -->
+  <div class="section">
+    <label for="sensitivity">🎯 Độ nhạy AimLock: <span class="value" id="sensitivityValue">50</span>°</label><br>
+    <input type="range" id="sensitivity" min="0" max="360" value="50" oninput="updateSensitivity(this.value)">
+  </div>
+
+  <!-- Kiểm tra tọa độ tap -->
+  <div class="section">
+    <h3>📍 Kiểm tra tọa độ Tap</h3>
+    <input id="tapX" placeholder="Tọa độ X nút bắn">
+    <input id="tapY" placeholder="Tọa độ Y nút bắn">
+    <button onclick="kiemTraTap()">🔄 Kiểm tra</button>
+  </div>
+
+  <!-- Popup thành công -->
+  <div id="successPopup">🎉 Thành Công!</div>
+
+  <script>
+    function updateSensitivity(value) {
+      document.getElementById("sensitivityValue").innerText = value;
+    }
+
+    function showSuccess() {
+      const popup = document.getElementById("successPopup");
+      popup.style.display = "block";
+      setTimeout(() => popup.style.display = "none", 3000);
+    }
+
+    function taoReg() {
+      const name = document.getElementById("apnName").value.trim();
+      const apn = document.getElementById("apnValue").value.trim();
+      const status = document.getElementById("status");
+
+      const tapMatch = name.match(/Aim_(\d+)_(\d+)/);
+      const swipeMatch = apn.match(/swipe-(\d+)-(\d+)-(\d+)-(\d+)-(\d+)/);
+
+      status.innerText = "⏳ Đang cài đặt...";
+      setTimeout(() => {
+        if (!tapMatch || !swipeMatch) {
+          status.innerText = "❌ Cài đặt thất bại!";
+        } else {
+          status.innerText = "✅ Cài đặt thành công!";
+          const tapX = tapMatch[1], tapY = tapMatch[2];
+          const [_, sx, sy, ex, ey, time] = swipeMatch;
+          const reg = `input tap ${tapX} ${tapY}\nsleep 0.1\ninput swipe ${sx} ${sy} ${ex} ${ey} ${time}`;
+          console.log("Reg:", reg);
+          showSuccess(); // Hiện popup khi thành công
+        }
+      }, 3000);
+    }
+
+    function fakeInfo() {
+      const temp = (Math.random() * 10 + 35).toFixed(1); // 35–45°C
+      const fps = Math.floor(Math.random() * 20 + 40); // 40–60 FPS
+      document.getElementById("temp").innerText = temp;
+      document.getElementById("fps").innerText = fps;
+    }
+
+    function vaoFFThuong() {
+      window.location.href = "intent://com.dts.freefireth/#Intent;scheme=android-app;end";
+      setTimeout(() => {
+        alert("❌ Không mở được Free Fire bản thường. Hãy cài game trước!");
+      }, 3000);
+    }
+
+    function kiemTraTap() {
+      const x = document.getElementById("tapX").value.trim();
+      const y = document.getElementById("tapY").value.trim();
+      const status = document.getElementById("status");
+
+      status.innerText = "⏳ Đang xử lý...";
+      
+      setTimeout(() => {
+        if (x !== "" && y !== "" && !isNaN(x) && !isNaN(y)) {
+          status.innerText = "✅ Cài đặt thành công!";
+        } else {
+          status.innerText = "❌ Cài đặt thất bại!";
+        }
+      }, 2000);
+    }
+
+    function applyAim() {
+      const mode = document.getElementById("aimMode").value;
+      const status = document.getElementById("aimStatus");
+      switch (mode) {
+        case "light":
+          status.innerText = "AimLock: Kéo nhẹ ✅";
+          break;
+        case "medium":
+          status.innerText = "AimLock: Tự động Aim ✅";
+          break;
+        case "off":
+          status.innerText = "AimLock: Đã tắt ❌";
+          break;
+      }
+    }
+  </script>
+
+</body>
+</html>
